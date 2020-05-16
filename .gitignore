@@ -1,0 +1,9 @@
+.build/
+_build/
+build/
+bin/
+lib/
+.build/
+cmake-build-debug/
+.idea/
+.vscode/
