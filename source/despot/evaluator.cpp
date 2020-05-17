@@ -43,14 +43,14 @@ void EvalLog::Save() {
 	ofstream fout(log_file_.c_str(), ofstream::out);
 	fout << start_time << endl;
 	fout << runned_instances.size() << endl;
-	for (int i = 0; i < runned_instances.size(); i++)
+	for (size_t i = 0; i < runned_instances.size(); i++)
 		fout << runned_instances[i] << " " << num_of_completed_runs[i] << endl;
 	fout.close();
 }
 
 void EvalLog::IncNumOfCompletedRuns(string problem) {
 	bool seen = false;
-	for (int i = 0; i < runned_instances.size(); i++) {
+	for (size_t i = 0; i < runned_instances.size(); i++) {
 		if (runned_instances[i] == problem) {
 			num_of_completed_runs[i]++;
 			seen = true;
@@ -65,7 +65,7 @@ void EvalLog::IncNumOfCompletedRuns(string problem) {
 
 int EvalLog::GetNumCompletedRuns() const {
 	int num = 0;
-	for (int i = 0; i < num_of_completed_runs.size(); i++)
+	for (size_t i = 0; i < num_of_completed_runs.size(); i++)
 		num += num_of_completed_runs[i];
 	return num;
 }
@@ -75,7 +75,7 @@ int EvalLog::GetNumRemainingRuns() const {
 }
 
 int EvalLog::GetNumCompletedRuns(string instance) const {
-	for (int i = 0; i < runned_instances.size(); i++) {
+	for (size_t i = 0; i < runned_instances.size(); i++) {
 		if (runned_instances[i] == instance)
 			return num_of_completed_runs[i];
 	}
@@ -221,7 +221,7 @@ bool Evaluator::RunStep(int step, int round) {
 
 double Evaluator::AverageUndiscountedRoundReward() const {
 	double sum = 0;
-	for (int i = 0; i < undiscounted_round_rewards_.size(); i++) {
+	for (size_t i = 0; i < undiscounted_round_rewards_.size(); i++) {
 		double reward = undiscounted_round_rewards_[i];
 		sum += reward;
 	}
@@ -230,7 +230,7 @@ double Evaluator::AverageUndiscountedRoundReward() const {
 
 double Evaluator::StderrUndiscountedRoundReward() const {
 	double sum = 0, sum2 = 0;
-	for (int i = 0; i < undiscounted_round_rewards_.size(); i++) {
+	for (size_t i = 0; i < undiscounted_round_rewards_.size(); i++) {
 		double reward = undiscounted_round_rewards_[i];
 		sum += reward;
 		sum2 += reward * reward;
@@ -242,7 +242,7 @@ double Evaluator::StderrUndiscountedRoundReward() const {
 
 double Evaluator::AverageDiscountedRoundReward() const {
 	double sum = 0;
-	for (int i = 0; i < discounted_round_rewards_.size(); i++) {
+	for (size_t i = 0; i < discounted_round_rewards_.size(); i++) {
 		double reward = discounted_round_rewards_[i];
 		sum += reward;
 	}
@@ -251,7 +251,7 @@ double Evaluator::AverageDiscountedRoundReward() const {
 
 double Evaluator::StderrDiscountedRoundReward() const {
 	double sum = 0, sum2 = 0;
-	for (int i = 0; i < discounted_round_rewards_.size(); i++) {
+	for (size_t i = 0; i < discounted_round_rewards_.size(); i++) {
 		double reward = discounted_round_rewards_[i];
 		sum += reward;
 		sum2 += reward * reward;

@@ -138,8 +138,8 @@ public:
 	*/
 
 	std::vector<int> CreateStateUniformly() const;
-	std::vector<int> ComputeState(double random) const;
-	std::vector<int> ComputeState(int index) const;
+	std::vector<int > ComputeState(double random) const;
+	std::vector<int > ComputeState(int index) const;
 	int ComputeIndex(const std::vector<int>& state) const;
 	double InitialWeight(const std::vector<int>& state) const;
 

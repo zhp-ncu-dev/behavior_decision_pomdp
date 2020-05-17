@@ -16,7 +16,7 @@ Function::Function(NamedVar* child, vector<NamedVar*> parents) :
 	child_(child),
 	parents_(parents) {
 	int parent_size = 1;
-	for (int i = 0; i < parents.size(); i++)
+	for (size_t i = 0; i < parents.size(); i++)
 		parent_size *= parents[i]->values().size();
 
 	if (child->values().size() < 100) { // TODO: possible refactoring to use a single data structure
@@ -34,7 +34,7 @@ Function::~Function() {
 
 bool Function::SetValue(vector<string>& keys, int key_pos, int pid, int cid,
 	const vector<double>& values, int start, int end) {
-	if (key_pos == parents_.size() + 1) {
+	if (key_pos == static_cast<int>(parents_.size() + 1)) {
 		assert(start == end - 1);
 
 		if (values_.size() > 0) // TODO: possible refactoring to use a single data structure
@@ -50,13 +50,13 @@ bool Function::SetValue(vector<string>& keys, int key_pos, int pid, int cid,
 		return true;
 	} else {
 		NamedVar* curr =
-			(key_pos == keys.size() - 1) ? child_ : parents_[key_pos];
+			(key_pos == static_cast<int>(keys.size() - 1)) ? child_ : parents_[key_pos];
 		const vector<string>& dom = curr->values();
 
 		if (keys[key_pos] == "*") {
-			for (int i = 0; i < dom.size(); i++) {
+			for (size_t i = 0; i < dom.size(); i++) {
 				int next_cid = cid, next_pid = pid;
-				if (key_pos == keys.size() - 1)
+				if (key_pos == static_cast<int>(keys.size() - 1))
 					next_cid = i;
 				else
 					next_pid = pid * dom.size() + i;
@@ -69,9 +69,9 @@ bool Function::SetValue(vector<string>& keys, int key_pos, int pid, int cid,
 		} else if (keys[key_pos] == "-") {
 			int block_size = (end - start) / curr->values().size();
 
-			for (int i = 0; i < dom.size(); i++) {
+			for (size_t i = 0; i < dom.size(); i++) {
 				int next_cid = cid, next_pid = pid;
-				if (key_pos == keys.size() - 1)
+				if (key_pos == static_cast<int>(keys.size() - 1))
 					next_cid = i;
 				else
 					next_pid = pid * dom.size() + i;
@@ -89,7 +89,7 @@ bool Function::SetValue(vector<string>& keys, int key_pos, int pid, int cid,
 				return false;
 			}
 
-			if (key_pos == keys.size() - 1)
+			if (key_pos == static_cast<int>(keys.size() - 1))
 				cid = id;
 			else
 				pid = pid * dom.size() + id;
@@ -148,7 +148,7 @@ const NamedVar* Function::child() const {
 
 double Function::ComputeConstrainedMaximum(const NamedVar* var,
 	int value) const {
-	if (var->values().size() <= value)
+	if (static_cast<int>(var->values().size()) <= value)
 		throw std::invalid_argument(
 			"Variable " + var->name() + " cannot have value " + to_string(value)
 				+ ".");
@@ -165,7 +165,7 @@ double Function::ComputeConstrainedMaximum(const NamedVar* var,
 				max = GetValue(p, value);
 	} else {
 		int id = -1;
-		for (int i = 0; i < parents_.size(); i++)
+		for (size_t i = 0; i < parents_.size(); i++)
 			if (parents_[i] == var) {
 				id = i;
 				break;
@@ -190,7 +190,7 @@ double Function::ComputeConstrainedMaximum(const NamedVar* var,
 
 double Function::ComputeConstrainedMinimum(const NamedVar* var,
 	int value) const {
-	if (var->values().size() <= value)
+	if (static_cast<int>(var->values().size()) <= value)
 		throw std::invalid_argument(
 			"Variable " + var->name() + " cannot have value " + to_string(value)
 				+ ".");
@@ -230,20 +230,20 @@ double Function::ComputeConstrainedMinimum(const NamedVar* var,
 
 ostream& operator<<(ostream& os, const Function& func) {
 	os << "Vars: [";
-	for (int i = 0; i < func.parents_.size(); i++) {
+	for (size_t i = 0; i < func.parents_.size(); i++) {
 		os << func.parents_[i]->name()
 			<< (i == func.parents_.size() - 1 ? " -> " : ", ");
 	}
 	os << func.child_->name() << "]" << endl; // TODO: should print curr_name here but prev_name above for state variable
 
 	if (func.values_.size() > 0) {
-		for (int p = 0; p < func.values_.size(); p++) {
+		for (size_t p = 0; p < func.values_.size(); p++) {
 			vector<int> index = Variable::ComputeIndexVec(func.parents_, p);
 			vector<string> str;
-			for (int i = 0; i < index.size(); i++)
+			for (size_t i = 0; i < index.size(); i++)
 				str.push_back(func.parents_[i]->GetValue(index[i]));
 			os << " " << str << ":";
-			for (int c = 0; c < func.values_[p].size(); c++) {
+			for (size_t c = 0; c < func.values_[p].size(); c++) {
 				if (func.values_[p][c] != 0)
 					os << " " << func.child_->GetValue(c) << ":"
 						<< func.values_[p][c];
@@ -252,10 +252,10 @@ ostream& operator<<(ostream& os, const Function& func) {
 				os << endl;
 		}
 	} else {
-		for (int p = 0; p < func.map_.size(); p++) {
+		for (size_t p = 0; p < func.map_.size(); p++) {
 			vector<int> index = Variable::ComputeIndexVec(func.parents_, p);
 			vector<string> str;
-			for (int i = 0; i < index.size(); i++)
+			for (size_t i = 0; i < index.size(); i++)
 				str.push_back(func.parents_[i]->GetValue(index[i]));
 			os << " " << str << ":";
 
@@ -287,7 +287,7 @@ TabularCPT::TabularCPT(NamedVar* child, vector<NamedVar*> parents) {
 	parents_ = parents;
 
 	int parent_size = 1;
-	for (int i = 0; i < parents.size(); i++)
+	for (size_t i = 0; i < parents.size(); i++)
 		parent_size *= parents[i]->values().size();
 
 	if (child->values().size() < 100) { // TODO: possible refactoring to use a single data structure
@@ -311,7 +311,7 @@ bool TabularCPT::Validate() const {
 		if (fabs(sum - 1.0) > 1e-6) {
 			vector<int> index = Variable::ComputeIndexVec(parents_, p);
 			cerr << "ERROR: Probabilities do not sum to one when parents = [";
-			for (int i = 0; i < index.size(); i++) {
+			for (size_t i = 0; i < index.size(); i++) {
 				cerr << (i == 0 ? "" : ", ") << parents_[i]->name() << "="
 					<< parents_[i]->GetValue(index[i]);
 			}
@@ -343,7 +343,7 @@ bool TabularCPT::Validate() const {
  * =============================================================================*/
 int TabularCPT::ComputeIndex(int pid, double& sum) const {
 	if (sparse_values_.size() != 0) {
-		for (int i = 0; i < sparse_values_[pid].size(); i++) {
+		for (size_t i = 0; i < sparse_values_[pid].size(); i++) {
 			const pair<int, double>& pair = sparse_values_[pid][i];
 			if (sum < pair.second) {
 				sum /= pair.second * (1 + 1E-9);
@@ -353,7 +353,7 @@ int TabularCPT::ComputeIndex(int pid, double& sum) const {
 		}
 		return -1;
 	} else {
-		for (int cur = 0; cur < values_[pid].size(); cur++) {
+		for (size_t cur = 0; cur < values_[pid].size(); cur++) {
 			if (sum < values_[pid][cur]) {
 				sum /= values_[pid][cur] * (1 + 1E-9);
 				return cur;
@@ -384,13 +384,13 @@ void TabularCPT::ComputeSparseChildDistribution() {
 
 bool TabularCPT::IsIdentityUnderConstraint(const NamedVar* var,
 	int value) const {
-	if (var->values().size() <= value)
+	if (static_cast<int>(var->values().size()) <= value)
 		throw std::invalid_argument(
 			"Variable " + var->name() + " cannot have value " + to_string(value)
 				+ ".");
 
 	int child_id = -1;
-	for (int i = 0; i < parents_.size(); i++)
+	for (size_t i = 0; i < parents_.size(); i++)
 		if (parents_[i] == child_)
 			child_id = i;
 
@@ -398,7 +398,7 @@ bool TabularCPT::IsIdentityUnderConstraint(const NamedVar* var,
 		return false;
 
 	int var_id = -1;
-	for (int i = 0; i < parents_.size(); i++)
+	for (size_t i = 0; i < parents_.size(); i++)
 		if (parents_[i] == var) {
 			var_id = i;
 			break;
@@ -470,20 +470,20 @@ int HierarchyCPT::ComputeCurrentIndex(double& sum) const {
 
 int HierarchyCPT::ParentSize() const {
 	int size = 1;
-	for (int i = 0; i < parents_.size(); i++)
+	for (size_t i = 0; i < parents_.size(); i++)
 		size *= parents_[i]->Size();
 	return size;
 }
 
 bool HierarchyCPT::Validate() const {
-	for (int i = 0; i < cpts_.size(); i++)
+	for (size_t i = 0; i < cpts_.size(); i++)
 		if (!cpts_[i]->Validate())
 			return false;
 	return true;
 }
 
 void HierarchyCPT::ComputeSparseChildDistribution() {
-	for (int i = 0; i < cpts_.size(); i++)
+	for (size_t i = 0; i < cpts_.size(); i++)
 		cpts_[i]->ComputeSparseChildDistribution();
 }
 
@@ -492,7 +492,7 @@ bool HierarchyCPT::IsIdentityUnderConstraint(const NamedVar* var,
 	if (var == parents_[0])
 		return cpts_[value]->IsIdentityUnderConstraint(var, value);
 
-	for (int i = 0; i < cpts_.size(); i++)
+	for (size_t i = 0; i < cpts_.size(); i++)
 		if (!cpts_[i]->IsIdentityUnderConstraint(var, value))
 			return false;
 	return true;
@@ -500,7 +500,7 @@ bool HierarchyCPT::IsIdentityUnderConstraint(const NamedVar* var,
 
 CPT* HierarchyCPT::CreateNoisyVariant(double noise) const {
 	HierarchyCPT* hcpt = new HierarchyCPT(child_, parents_);
-	for (int i = 0; i < cpts_.size(); i++)
+	for (size_t i = 0; i < cpts_.size(); i++)
 		hcpt->cpts_[i] = static_cast<TabularCPT*>(cpts_[i]->CreateNoisyVariant(
 			noise));
 	return hcpt;
@@ -508,7 +508,7 @@ CPT* HierarchyCPT::CreateNoisyVariant(double noise) const {
 
 ostream& operator<<(std::ostream& os, const HierarchyCPT& hcpt) {
 	os << "Root variable: " << hcpt.parents_[0]->name() << endl;
-	for (int i = 0; i < hcpt.cpts_.size(); i++)
+	for (size_t i = 0; i < hcpt.cpts_.size(); i++)
 		os << hcpt.parents_[0]->name() << " = " << hcpt.parents_[0]->GetValue(i)
 			<< " " << *(hcpt.cpts_[i]) << endl;
 	return os;

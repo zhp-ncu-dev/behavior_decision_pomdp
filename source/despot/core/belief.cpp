@@ -29,7 +29,7 @@ vector<State*> Belief::Sample(int num, vector<State*> particles,
 	const DSPOMDP* model) {
 	double unit = 1.0 / num;
 	double mass = Random::RANDOM.NextDouble(0, unit);
-	int pos = 0;
+    size_t pos = 0;
 	double cur = particles[0]->weight;
 
 	vector<State*> sample;
@@ -53,7 +53,7 @@ vector<State*> Belief::Sample(int num, vector<State*> particles,
 
 	logd << "[Belief::Sample] Sampled " << sample.size() << " particles"
 		<< endl;
-	for (int i = 0; i < sample.size(); i++) {
+	for (size_t i = 0; i < sample.size(); i++) {
 		logv << " " << i << " = " << *sample[i] << endl;
 	}
 
@@ -64,7 +64,7 @@ vector<State*> Belief::Resample(int num, const vector<State*>& belief,
 	const DSPOMDP* model, History history, int hstart) {
 	double unit = 1.0 / num;
 	double mass = Random::RANDOM.NextDouble(0, unit);
-	int pos = 0;
+    size_t pos = 0;
 	double cur = belief[0]->weight;
 
 	double reward;
@@ -91,7 +91,7 @@ vector<State*> Belief::Resample(int num, const vector<State*>& belief,
 
 		// Step through history
 		double log_wgt = 0;
-		for (int i = hstart; i < history.Size(); i++) {
+		for (size_t i = hstart; i < history.Size(); i++) {
 			model->Step(*particle, Random::RANDOM.NextDouble(),
 				history.Action(i), reward, obs);
 
@@ -117,7 +117,7 @@ vector<State*> Belief::Resample(int num, const vector<State*>& belief,
 
 		// Remove particles with very small weights
 		if (count == num) {
-			for (int i = sample.size() - 1; i >= 0; i--)
+			for (size_t i = sample.size() - 1; i >= 0; i--)
 				if (sample[i]->weight - max_wgt < log(1.0 / num)) {
 					model->Free(sample[i]);
 					sample.erase(sample.begin() + i);
@@ -127,17 +127,17 @@ vector<State*> Belief::Resample(int num, const vector<State*>& belief,
 	}
 
 	double total_weight = 0;
-	for (int i = 0; i < sample.size(); i++) {
+	for (size_t i = 0; i < sample.size(); i++) {
 		sample[i]->weight = exp(sample[i]->weight - max_wgt);
 		total_weight += sample[i]->weight;
 	}
-	for (int i = 0; i < sample.size(); i++) {
+	for (size_t i = 0; i < sample.size(); i++) {
 		sample[i]->weight = sample[i]->weight / total_weight;
 	}
 
 	logd << "[Belief::Resample] Resampled " << sample.size() << " particles"
 		<< endl;
-	for (int i = 0; i < sample.size(); i++) {
+	for (size_t i = 0; i < sample.size(); i++) {
 		logv << " " << i << " = " << *sample[i] << endl;
 	}
 
@@ -173,7 +173,7 @@ vector<State*> Belief::Resample(int num, const Belief& belief, History history,
 
 	vector<State*> sample;
 	int count = 0;
-	int pos = 0;
+    size_t pos = 0;
 	double max_wgt = Globals::NEG_INFTY;
 	vector<State*> particles;
 	int trial = 0;
@@ -189,7 +189,7 @@ vector<State*> Belief::Resample(int num, const Belief& belief, History history,
 
 		// Step through history
 		double log_wgt = 0;
-		for (int i = hstart; i < history.Size(); i++) {
+		for (size_t i = hstart; i < history.Size(); i++) {
 			belief.model_->Step(*particle, Random::RANDOM.NextDouble(),
 				history.Action(i), reward, obs);
 
@@ -214,7 +214,7 @@ vector<State*> Belief::Resample(int num, const Belief& belief, History history,
 
 		// Remove particles with very small weights
 		if (count == num) {
-			for (int i = sample.size() - 1; i >= 0; i--) {
+			for (size_t i = sample.size() - 1; i >= 0; i--) {
 				if (sample[i]->weight - max_wgt < log(1.0 / num)) {
 					belief.model_->Free(sample[i]);
 					sample.erase(sample.begin() + i);
@@ -227,21 +227,21 @@ vector<State*> Belief::Resample(int num, const Belief& belief, History history,
 	}
 
 	// Free unused particles
-	for (int i = pos; i < particles.size(); i++)
+	for (size_t i = pos; i < particles.size(); i++)
 		belief.model_->Free(particles[i]);
 
 	double total_weight = 0;
-	for (int i = 0; i < sample.size(); i++) {
+	for (size_t i = 0; i < sample.size(); i++) {
 		sample[i]->weight = exp(sample[i]->weight - max_wgt);
 		total_weight += sample[i]->weight;
 	}
-	for (int i = 0; i < sample.size(); i++) {
+	for (size_t i = 0; i < sample.size(); i++) {
 		sample[i]->weight = sample[i]->weight / total_weight;
 	}
 
 	logd << "[Belief::Resample] Resampled " << sample.size() << " particles"
 		<< endl;
-	for (int i = 0; i < sample.size(); i++) {
+	for (size_t i = 0; i < sample.size(); i++) {
 		logv << " " << i << " = " << *sample[i] << endl;
 	}
 
@@ -274,9 +274,9 @@ ParticleBelief::ParticleBelief(vector<State*> particles, const DSPOMDP* model,
 			logi << "[ParticleBelief::ParticleBelief] Splitting " << particles_.size()
 				<< " particles into " << num_particles_ << " particles." << endl;
 			vector<State*> new_particles;
-			int n = num_particles_ / particles_.size();
-			for (int i = 0; i < n; i++) {
-				for (int j = 0; j < particles_.size(); j++) {
+			size_t n = num_particles_ / particles_.size();
+			for (size_t i = 0; i < n; i++) {
+				for (size_t j = 0; j < particles_.size(); j++) {
 					State* particle = particles_[j];
 					State* copy = model_->Copy(particle);
 					copy->weight /= n;
@@ -284,7 +284,7 @@ ParticleBelief::ParticleBelief(vector<State*> particles, const DSPOMDP* model,
 				}
 			}
 
-			for (int i = 0; i < particles_.size(); i++)
+			for (size_t i = 0; i < particles_.size(); i++)
 				model_->Free(particles_[i]);
 
 			particles_ = new_particles;
@@ -300,17 +300,17 @@ ParticleBelief::ParticleBelief(vector<State*> particles, const DSPOMDP* model,
 	// cerr << "Number of particles in initial belief: " << particles_.size() << endl;
 
 	if (prior_ == NULL) {
-		for (int i = 0; i < particles.size(); i++)
+		for (size_t i = 0; i < particles.size(); i++)
 			initial_particles_.push_back(model_->Copy(particles[i]));
 	}
 }
 
 ParticleBelief::~ParticleBelief() {
-	for (int i = 0; i < particles_.size(); i++) {
+	for (size_t i = 0; i < particles_.size(); i++) {
 		model_->Free(particles_[i]);
 	}
 
-	for (int i = 0; i < initial_particles_.size(); i++) {
+	for (size_t i = 0; i < initial_particles_.size(); i++) {
 		model_->Free(initial_particles_[i]);
 	}
 }
@@ -335,7 +335,7 @@ void ParticleBelief::Update(int action, OBS_TYPE obs) {
 	double reward;
 	OBS_TYPE o;
 	// Update particles
-	for (int i = 0; i <particles_.size(); i++) {
+	for (size_t i = 0; i <particles_.size(); i++) {
 		State* particle = particles_[i];
 		bool terminal = model_->Step(*particle, Random::RANDOM.NextDouble(),
 			action, reward, o);
@@ -380,21 +380,20 @@ void ParticleBelief::Update(int action, OBS_TYPE obs) {
 
 		if (particles_.size() == 0) {
 			logw << "Resampling failed - Using initial particles" << endl;
-			for (int i = 0; i < initial_particles_.size(); i ++)
+			for (size_t i = 0; i < initial_particles_.size(); i ++)
 				particles_.push_back(model_->Copy(initial_particles_[i]));
 		}
 		
 		//Update total weight so that effective number of particles are computed correctly 
 		total_weight = 0;
-                for (int i = 0; i < particles_.size(); i++) {
-		    State* particle = particles_[i];
-                    total_weight = total_weight + particle->weight;
-                }
+        for (size_t i = 0; i < particles_.size(); i++) {
+            State* particle = particles_[i];
+            total_weight = total_weight + particle->weight;
+        }
 	}
 
-	
 	double weight_square_sum = 0;
-	for (int i = 0; i < particles_.size(); i++) {
+	for (size_t i = 0; i < particles_.size(); i++) {
 		State* particle = particles_[i];
 		particle->weight /= total_weight;
 		weight_square_sum += particle->weight * particle->weight;
@@ -405,7 +404,7 @@ void ParticleBelief::Update(int action, OBS_TYPE obs) {
 	if (num_effective_particles < num_particles_ / 2.0) {
 		vector<State*> new_belief = Belief::Sample(num_particles_, particles_,
 			model_);
-		for (int i = 0; i < particles_.size(); i++)
+		for (size_t i = 0; i < particles_.size(); i++)
 			model_->Free(particles_[i]);
 
 		particles_ = new_belief;
@@ -414,7 +413,7 @@ void ParticleBelief::Update(int action, OBS_TYPE obs) {
 
 Belief* ParticleBelief::MakeCopy() const {
 	vector<State*> copy;
-	for (int i = 0; i < particles_.size(); i++) {
+	for (size_t i = 0; i < particles_.size(); i++) {
 		copy.push_back(model_->Copy(particles_[i]));
 	}
 
@@ -424,13 +423,13 @@ Belief* ParticleBelief::MakeCopy() const {
 string ParticleBelief::text() const {
 	ostringstream oss;
 	map<string, double> pdf;
-	for (int i = 0; i < particles_.size(); i++) {
+	for (size_t i = 0; i < particles_.size(); i++) {
 		pdf[particles_[i]->text()] += particles_[i]->weight;
 	}
 
 	oss << "pdf for " << particles_.size() << " particles:" << endl;
 	vector<pair<string, double> > pairs = SortByValue(pdf);
-	for (int i = 0; i < pairs.size(); i++) {
+	for (size_t i = 0; i < pairs.size(); i++) {
 		pair<string, double> pair = pairs[i];
 		oss << " " << pair.first << " = " << pair.second << endl;
 	}

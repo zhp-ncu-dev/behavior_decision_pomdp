@@ -15,7 +15,7 @@ Variable::~Variable() {
 
 void Variable::values(const vector<string>& ve) {
 	values_ = ve;
-	for (int i = 0; i < values_.size(); i++)
+	for (size_t i = 0; i < values_.size(); i++)
 		index_[values_[i]] = i;
 }
 
@@ -25,7 +25,7 @@ void Variable::values(string prefix, int num) {
 		values_[i] = prefix + to_string(i);
 
 	// NOTE: Index can be computed by stripping of the prefix
-	for (int i = 0; i < values_.size(); i++)
+	for (size_t i = 0; i < values_.size(); i++)
 		index_[values_[i]] = i;
 }
 
@@ -44,7 +44,7 @@ int Variable::IndexOf(string value) const {
 }
 
 const bool Variable::HasValue(string value) const {
-	for (int i = 0; i < values_.size(); i++)
+	for (size_t i = 0; i < values_.size(); i++)
 		if (values_[i] == value)
 			return true;
 	return false;
@@ -85,7 +85,7 @@ vector<int> Variable::ComputeIndexVec(const vector<StateVar*>& vars,
 
 int Variable::ComputeCurrentIndex(const vector<Variable*>& vars) {
 	int index = 0;
-	for (int i = 0; i < vars.size(); i++) {
+	for (size_t i = 0; i < vars.size(); i++) {
 		Variable* var = vars[i];
 		index = index * var->Size() + var->curr_value;
 	}
@@ -94,7 +94,7 @@ int Variable::ComputeCurrentIndex(const vector<Variable*>& vars) {
 
 int Variable::ComputeCurrentIndex(const vector<NamedVar*>& vars) {
 	int index = 0;
-	for (int i = 0; i < vars.size(); i++) {
+	for (size_t i = 0; i < vars.size(); i++) {
 		NamedVar* var = vars[i];
 		index = index * var->Size() + var->curr_value;
 	}
@@ -102,7 +102,7 @@ int Variable::ComputeCurrentIndex(const vector<NamedVar*>& vars) {
 }
 
 bool Variable::IsVariableName(string name, const vector<NamedVar>& vars) {
-	for (int i = 0; i < vars.size(); i++) {
+	for (size_t i = 0; i < vars.size(); i++) {
 		const NamedVar& var = vars[i];
 		if (name == var.name())
 			return true;
@@ -111,7 +111,7 @@ bool Variable::IsVariableName(string name, const vector<NamedVar>& vars) {
 }
 
 bool Variable::IsVariableName(string name, const vector<StateVar>& vars) {
-	for (int i = 0; i < vars.size(); i++) {
+	for (size_t i = 0; i < vars.size(); i++) {
 		const StateVar& var = vars[i];
 		if (name == var.name())
 			return true;
@@ -120,7 +120,7 @@ bool Variable::IsVariableName(string name, const vector<StateVar>& vars) {
 }
 
 bool Variable::IsVariableCurrName(string name, const vector<StateVar>& vars) {
-	for (int i = 0; i < vars.size(); i++) {
+	for (size_t i = 0; i < vars.size(); i++) {
 		const StateVar& var = vars[i];
 		if (name == var.curr_name())
 			return true;
@@ -129,7 +129,7 @@ bool Variable::IsVariableCurrName(string name, const vector<StateVar>& vars) {
 }
 
 bool Variable::IsVariablePrevName(string name, const vector<StateVar>& vars) {
-	for (int i = 0; i < vars.size(); i++) {
+	for (size_t i = 0; i < vars.size(); i++) {
 		const StateVar& var = vars[i];
 		if (name == var.prev_name())
 			return true;
@@ -153,7 +153,7 @@ ostream& operator<<(std::ostream& os, const NamedVar& var) {
 	os << "Name:" << var.name_ << endl;
 	os << "Values:";
 
-	for (int i = 0; i < var.values_.size(); i++) {
+	for (size_t i = 0; i < var.values_.size(); i++) {
 		os << " " << i << "=" << var.values_[i];
 	}
 	return os;

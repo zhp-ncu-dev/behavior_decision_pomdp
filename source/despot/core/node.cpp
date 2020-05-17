@@ -20,7 +20,7 @@ VNode::VNode(vector<State*>& particles, int depth, QNode* parent,
 	likelihood(1) {
 	logd << "Constructed vnode with " << particles_.size() << " particles"
 		<< endl;
-	for (int i = 0; i < particles_.size(); i++) {
+	for (size_t i = 0; i < particles_.size(); i++) {
 		logd << " " << i << " = " << *particles_[i] << endl;
 	}
 }
@@ -44,7 +44,7 @@ VNode::VNode(int count, double value, int depth, QNode* parent, OBS_TYPE edge) :
 }
 
 VNode::~VNode() {
-	for (int a = 0; a < children_.size(); a++) {
+	for (size_t a = 0; a < children_.size(); a++) {
 		QNode* child = children_[a];
 		assert(child != NULL);
 		delete child;
@@ -105,7 +105,7 @@ QNode* VNode::Child(int action) {
 
 int VNode::Size() const {
 	int size = 1;
-	for (int a = 0; a < children_.size(); a++) {
+	for (size_t a = 0; a < children_.size(); a++) {
 		size += children_[a]->Size();
 	}
 	return size;
@@ -116,7 +116,7 @@ int VNode::PolicyTreeSize() const {
 		return 0;
 
 	QNode* best = NULL;
-	for (int a = 0; a < children_.size(); a++) {
+	for (size_t a = 0; a < children_.size(); a++) {
 		QNode* child = children_[a];
 		if (best == NULL || child->lower_bound() > best->lower_bound())
 			best = child;
@@ -171,11 +171,11 @@ double VNode::value() const {
 }
 
 void VNode::Free(const DSPOMDP& model) {
-	for (int i = 0; i < particles_.size(); i++) {
+	for (size_t i = 0; i < particles_.size(); i++) {
 		model.Free(particles_[i]);
 	}
 
-	for (int a = 0; a < children().size(); a++) {
+	for (size_t a = 0; a < children().size(); a++) {
 		QNode* qnode = Child(a);
 		map<OBS_TYPE, VNode*>& children = qnode->children();
 		for (map<OBS_TYPE, VNode*>::iterator it = children.begin();
@@ -195,7 +195,7 @@ void VNode::PrintPolicyTree(int depth, ostream& os) {
 		os << this << "-a=" << astar << endl;
 	} else {
 		QNode* qstar = NULL;
-		for (int a = 0; a < qnodes.size(); a++) {
+		for (size_t a = 0; a < qnodes.size(); a++) {
 			QNode* qnode = qnodes[a];
 			if (qstar == NULL || qnode->lower_bound() > qstar->lower_bound()) {
 				qstar = qnode;
@@ -211,7 +211,7 @@ void VNode::PrintPolicyTree(int depth, ostream& os) {
 			labels.push_back(it->first);
 		}
 
-		for (int i = 0; i < labels.size(); i++) {
+		for (size_t i = 0; i < labels.size(); i++) {
 			if (depth == -1 || this->depth() + 1 <= depth) {
 				os << repeat("|   ", this->depth()) << "| o=" << labels[i]
 					<< ": ";
@@ -241,7 +241,7 @@ void VNode::PrintTree(int depth, ostream& os) {
 
 
 	vector<QNode*>& qnodes = children();
-	for (int a = 0; a < qnodes.size(); a++) {
+	for (size_t a = 0; a < qnodes.size(); a++) {
 		QNode* qnode = qnodes[a];
 
 		vector<OBS_TYPE> labels;
@@ -257,7 +257,7 @@ void VNode::PrintTree(int depth, ostream& os) {
 			<< ", u:" << qnode->upper_bound()
 			<< ", r:" << qnode->step_reward << ")" << endl;
 
-		for (int i = 0; i < labels.size(); i++) {
+		for (size_t i = 0; i < labels.size(); i++) {
 			if (depth == -1 || this->depth() + 1 <= depth) {
 				os << repeat("|   ", this->depth()) << "| o=" << labels[i]
 					<< ": ";

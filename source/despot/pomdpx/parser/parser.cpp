@@ -38,37 +38,37 @@ ostream& operator<<(ostream& out, const Parser& parser) {
 
 void Parser::Print(ostream& out) const {
 	out << "State variables" << endl;
-	for (int s = 0; s < curr_state_vars_.size(); s++) {
+	for (size_t s = 0; s < curr_state_vars_.size(); s++) {
 		out << "s[" << s << "] = " << curr_state_vars_[s] << endl;
 	}
 	out << endl;
 
 	out << "Observation variables" << endl;
-	for (int o = 0; o < obs_vars_.size(); o++) {
+	for (size_t o = 0; o < obs_vars_.size(); o++) {
 		out << "o[" << o << "] = " << obs_vars_[o] << endl;
 	}
 	out << endl;
 
 	out << "# Initial belief" << endl;
-	for (int s = 0; s < initial_belief_funcs_.size(); s++) {
+	for (size_t s = 0; s < initial_belief_funcs_.size(); s++) {
 		out << "s[" << s << "] = " << initial_belief_funcs_[s] << endl;
 	}
 	out << endl;
 
 	out << "# Transition probabilities" << endl;
-	for (int s = 0; s < transition_funcs_.size(); s++) {
+	for (size_t s = 0; s < transition_funcs_.size(); s++) {
 		out << "s[" << s << "] = " << *transition_funcs_[s] << endl;
 	}
 	out << endl;
 
 	out << "# Observation probabilities" << endl;
-	for (int o = 0; o < obs_funcs_.size(); o++) {
+	for (size_t o = 0; o < obs_funcs_.size(); o++) {
 		out << "o[" << o << "] = " << obs_funcs_[o] << endl;
 	}
 	out << endl;
 
 	out << "# Reward functions" << endl;
-	for (int r = 0; r < reward_funcs_.size(); r++) {
+	for (size_t r = 0; r < reward_funcs_.size(); r++) {
 		out << "r[" << r << "] = " << reward_funcs_[r] << endl;
 	}
 	out << endl;
@@ -118,9 +118,9 @@ void Parser::Check() {
 
 ValuedAction Parser::ComputeMaxRewardAction() const {
 	ValuedAction max(-1, Globals::NEG_INFTY);
-	for (int a = 0; a < action_vars_[0].Size(); a++) {
+	for (int a = 0; a < static_cast<int>(action_vars_[0].Size()); a++) {
 		double reward = 0;
-		for (int r = 0; r < reward_funcs_.size(); r++) {
+		for (int r = 0; r < static_cast<int>(reward_funcs_.size()); r++) {
 			reward += reward_funcs_[r].ComputeConstrainedMaximum(
 				&action_vars_[0], a);
 		}
@@ -133,9 +133,9 @@ ValuedAction Parser::ComputeMaxRewardAction() const {
 
 ValuedAction Parser::ComputeMinRewardAction() const {
 	ValuedAction min(-1, Globals::NEG_INFTY);
-	for (int a = 0; a < action_vars_[0].Size(); a++) {
+	for (int a = 0; a < static_cast<int>(action_vars_[0].Size()); a++) {
 		double reward = 0;
-		for (int r = 0; r < reward_funcs_.size(); r++) {
+		for (int r = 0; r < static_cast<int>(reward_funcs_.size()); r++) {
 			reward += reward_funcs_[r].ComputeConstrainedMinimum(
 				&action_vars_[0], a);
 		}
@@ -271,26 +271,26 @@ void Parser::ParseVariableTag(TiXmlHandle& xml_handle) {
 		e_Var = e_Var->NextSiblingElement();
 	}
 
-	for (int i = 0; i < prev_state_vars_.size(); i++) {
+	for (size_t i = 0; i < prev_state_vars_.size(); i++) {
 		StateVar& var = prev_state_vars_[i];
 		variables_[var.name()] = &var;
 	}
-	for (int i = 0; i < curr_state_vars_.size(); i++) {
+	for (size_t i = 0; i < curr_state_vars_.size(); i++) {
 		StateVar& var = curr_state_vars_[i];
 		variables_[var.name()] = &var;
 	}
 
-	for (int i = 0; i < obs_vars_.size(); i++) {
+	for (size_t i = 0; i < obs_vars_.size(); i++) {
 		ObsVar& var = obs_vars_[i];
 		variables_[var.name()] = &var;
 	}
 
-	for (int i = 0; i < action_vars_.size(); i++) {
+	for (size_t i = 0; i < action_vars_.size(); i++) {
 		ActionVar& var = action_vars_[i];
 		variables_[var.name()] = &var;
 	}
 
-	for (int i = 0; i < reward_vars_.size(); i++) {
+	for (size_t i = 0; i < reward_vars_.size(); i++) {
 		RewardVar& var = reward_vars_[i];
 		variables_[var.name()] = &var;
 	}
@@ -386,7 +386,7 @@ void Parser::ParseTerminalStateTag(TiXmlHandle& handle) {
 		TerminalPattern pattern;
 		// <Vars>
 		vector<string> names = Tokenize(GetFirstChildText(e_Table, "Vars"));
-		for (int i = 0; i < names.size(); i++) {
+		for (size_t i = 0; i < names.size(); i++) {
 			string name = names[i];
 			int id = 0;
 			while (curr_state_vars_[id].name() != name)
@@ -399,7 +399,7 @@ void Parser::ParseTerminalStateTag(TiXmlHandle& handle) {
 			// <Instance>
 			vector<string> instance = Tokenize(e_Instance->GetText());
 			vector<int> values;
-			for (int i = 0; i < instance.size(); i++) {
+			for (size_t i = 0; i < instance.size(); i++) {
 				values.push_back(
 					curr_state_vars_[pattern.state_ids[i]].IndexOf(
 						instance[i]));
@@ -482,13 +482,13 @@ TabularCPT Parser::CreateInitialBelief(TiXmlElement* e_CondProb) {
 		} else {
 			vector<string> value_tokens = Tokenize(table);
 
-			Ensure(value_tokens.size() == num_entries,
+			Ensure(value_tokens.size() == static_cast<size_t>(num_entries),
 				"In <InitialStateBelief>: " + to_string(num_entries)
 					+ " entries expected but " + to_string(value_tokens.size())
 					+ " found.", GetFirstChildElement(e_Entry, "ProbTable"));
 
 			values.resize(value_tokens.size());
-			for (int i = 0; i < value_tokens.size(); i++) {
+			for (size_t i = 0; i < value_tokens.size(); i++) {
 				values[i] = atof(value_tokens[i].c_str());
 			}
 		}
@@ -570,7 +570,7 @@ TabularCPT* Parser::CreateTabularStateTransition(TiXmlElement* e_CondProb) {
 	vector<NamedVar*> parents;
 	vector<string> parent_names = Tokenize(
 		GetFirstChildText(e_CondProb, "Parent"));
-	for (int i = 0; i < parent_names.size(); i++) {
+	for (size_t i = 0; i < parent_names.size(); i++) {
 		string parent_name = parent_names[i];
 		Ensure(
 			Variable::IsVariableName(parent_name, prev_state_vars_)
@@ -614,13 +614,13 @@ TabularCPT* Parser::CreateTabularStateTransition(TiXmlElement* e_CondProb) {
 		} else { // numbers
 			vector<string> value_tokens = Tokenize(table);
 
-			Ensure(num_entries == value_tokens.size(),
+			Ensure(num_entries == static_cast<int>(value_tokens.size()),
 				"In <StateTransitionFunction>: " + to_string(num_entries)
 					+ " entries expected but " + to_string(value_tokens.size())
 					+ " found.", GetFirstChildElement(e_Entry, "ProbTable"));
 
 			values.resize(value_tokens.size());
-			for (int i = 0; i < value_tokens.size(); i++) {
+			for (size_t i = 0; i < value_tokens.size(); i++) {
 				values[i] = atof(value_tokens[i].c_str());
 			}
 		}
@@ -652,7 +652,7 @@ HierarchyCPT* Parser::CreateHierarchyStateTransition(TiXmlElement* e_CondProb) {
 	vector<NamedVar*> parents;
 	vector<string> parent_names = Tokenize(
 		GetFirstChildText(e_CondProb, "Parent"));
-	for (int i = 0; i < parent_names.size(); i++) {
+	for (size_t i = 0; i < parent_names.size(); i++) {
 		string parent_name = parent_names[i];
 		Ensure(
 			Variable::IsVariableName(parent_name, prev_state_vars_)
@@ -673,7 +673,7 @@ HierarchyCPT* Parser::CreateHierarchyStateTransition(TiXmlElement* e_CondProb) {
 		vector<string> tokens = Tokenize(e_Vars->GetText());
 		int val = parents[0]->IndexOf(tokens[0]);
 		vector<NamedVar*> vars;
-		for (int i = 1; i < tokens.size(); i++)
+		for (size_t i = 1; i < tokens.size(); i++)
 			vars.push_back(static_cast<NamedVar*>(variables_[tokens[i]]));
 		func->SetParents(val, vars);
 
@@ -695,7 +695,7 @@ HierarchyCPT* Parser::CreateHierarchyStateTransition(TiXmlElement* e_CondProb) {
 		vector<string> value_tokens = Tokenize(table);
 
 		values.resize(value_tokens.size());
-		for (int i = 0; i < value_tokens.size(); i++) {
+		for (size_t i = 0; i < value_tokens.size(); i++) {
 			values[i] = atof(value_tokens[i].c_str());
 		}
 
@@ -758,7 +758,7 @@ TabularCPT* Parser::CreateTabularObsFunction(TiXmlElement* e_CondProb) {
 	vector<NamedVar*> parents;
 	vector<string> parent_names = Tokenize(
 		GetFirstChildText(e_CondProb, "Parent"));
-	for (int i = 0; i < parent_names.size(); i++) {
+	for (size_t i = 0; i < parent_names.size(); i++) {
 		string parent_name = parent_names[i];
 		Ensure(
 			Variable::IsVariableName(parent_name, curr_state_vars_)
@@ -794,13 +794,13 @@ TabularCPT* Parser::CreateTabularObsFunction(TiXmlElement* e_CondProb) {
 		} else { // numbers
 			vector<string> value_tokens = Tokenize(table);
 
-			Ensure(num_entries == value_tokens.size(),
+			Ensure(num_entries == static_cast<int>(value_tokens.size()),
 				"In <ObsFunction>: " + to_string(num_entries)
 					+ " entries expected but " + to_string(value_tokens.size())
 					+ " found.", GetFirstChildElement(e_Entry, "ProbTable"));
 
 			values.resize(value_tokens.size());
-			for (int i = 0; i < value_tokens.size(); i++) {
+			for (size_t i = 0; i < value_tokens.size(); i++) {
 				values[i] = atof(value_tokens[i].c_str());
 			}
 		}
@@ -831,7 +831,7 @@ HierarchyCPT* Parser::CreateHierarchyObsFunction(TiXmlElement* e_CondProb) {
 	vector<NamedVar*> parents;
 	vector<string> parent_names = Tokenize(
 		GetFirstChildText(e_CondProb, "Parent"));
-	for (int i = 0; i < parent_names.size(); i++) {
+	for (size_t i = 0; i < parent_names.size(); i++) {
 		string parent_name = parent_names[i];
 		Ensure(
 			Variable::IsVariableName(parent_name, curr_state_vars_)
@@ -851,7 +851,7 @@ HierarchyCPT* Parser::CreateHierarchyObsFunction(TiXmlElement* e_CondProb) {
 		vector<string> tokens = Tokenize(e_Vars->GetText());
 		int val = parents[0]->IndexOf(tokens[0]);
 		vector<NamedVar*> vars;
-		for (int i = 1; i < tokens.size(); i++)
+		for (size_t i = 1; i < tokens.size(); i++)
 			vars.push_back(static_cast<NamedVar*>(variables_[tokens[i]]));
 		func->SetParents(val, vars);
 
@@ -873,7 +873,7 @@ HierarchyCPT* Parser::CreateHierarchyObsFunction(TiXmlElement* e_CondProb) {
 		vector<string> value_tokens = Tokenize(table);
 
 		values.resize(value_tokens.size());
-		for (int i = 0; i < value_tokens.size(); i++) {
+		for (size_t i = 0; i < value_tokens.size(); i++) {
 			values[i] = atof(value_tokens[i].c_str());
 		}
 
@@ -925,7 +925,7 @@ Function Parser::CreateRewardFunction(TiXmlElement* e_Func) {
 	// <Parent>
 	vector<NamedVar*> parents;
 	vector<string> parent_names = Tokenize(GetFirstChildText(e_Func, "Parent"));
-	for (int i = 0; i < parent_names.size(); i++) {
+	for (size_t i = 0; i < parent_names.size(); i++) {
 		string str = parent_names[i];
 		parents.push_back(static_cast<StateVar*>(variables_[str]));
 	}
@@ -949,13 +949,13 @@ Function Parser::CreateRewardFunction(TiXmlElement* e_Func) {
 
 		vector<string> value_tokens = Tokenize(table);
 
-		Ensure(num_entries == value_tokens.size(),
+		Ensure(num_entries == static_cast<int>(value_tokens.size()),
 			"In <RewardFunction>: " + to_string(num_entries)
 				+ " entries expected but " + to_string(value_tokens.size())
 				+ " found.", GetFirstChildElement(e_Entry, "ValueTable"));
 
 		values.resize(value_tokens.size());
-		for (int i = 0; i < value_tokens.size(); i++) {
+		for (size_t i = 0; i < value_tokens.size(); i++) {
 			values[i] = atof(value_tokens[i].c_str());
 		}
 
@@ -973,7 +973,7 @@ Function Parser::CreateRewardFunction(TiXmlElement* e_Func) {
 int Parser::ComputeNumOfEntries(const vector<string>& instance,
 	const vector<NamedVar*>& parents, const NamedVar* child) const {
 	int num_entries = 1;
-	for (int i = 0; i < instance.size(); i++) {
+	for (size_t i = 0; i < instance.size(); i++) {
 		if (instance[i] == "-") {
 			if (i < instance.size() - 1)
 				num_entries *= parents[i]->Size();
@@ -1020,7 +1020,7 @@ TiXmlElement* Parser::GetFirstChildElement(TiXmlElement* elem,
 
 vector<int> Parser::CreateStateUniformly() const {
 	vector<int> state(curr_state_vars_.size());
-	for (int s = 0; s < state.size(); s++) {
+	for (size_t s = 0; s < state.size(); s++) {
 		state[s] = Random::RANDOM.NextInt(curr_state_vars_[s].Size());
 	}
 	return state;
@@ -1028,7 +1028,7 @@ vector<int> Parser::CreateStateUniformly() const {
 
 vector<int> Parser::ComputeState(double random) const {
 	vector<int> state(curr_state_vars_.size());
-	for (int s = 0; s < state.size(); s++) {
+	for (size_t s = 0; s < state.size(); s++) {
 		state[s] = initial_belief_funcs_[s].ComputeCurrentIndex(random);
 	}
 
@@ -1037,7 +1037,7 @@ vector<int> Parser::ComputeState(double random) const {
 
 vector<int> Parser::ComputeState(int index) const {
 	vector<int> state(curr_state_vars_.size());
-	for (int s = state.size() - 1; s >= 0; s--) {
+	for (int s = static_cast<int>(state.size() - 1); s >= 0; s--) {
 		state[s] = index % curr_state_vars_[s].Size();
 		index /= curr_state_vars_[s].Size();
 	}
@@ -1047,7 +1047,7 @@ vector<int> Parser::ComputeState(int index) const {
 
 int Parser::ComputeIndex(const vector<int>& state) const {
 	int index = 0;
-	for (int s = 0; s < curr_state_vars_.size(); s++) {
+	for (size_t s = 0; s < curr_state_vars_.size(); s++) {
 		index = index * curr_state_vars_[s].Size() + state[s];
 	}
 	return index;
@@ -1055,7 +1055,7 @@ int Parser::ComputeIndex(const vector<int>& state) const {
 
 double Parser::InitialWeight(const vector<int>& state) const {
 	double prob = 1;
-	for (int s = 0; s < curr_state_vars_.size(); s++) {
+	for (size_t s = 0; s < curr_state_vars_.size(); s++) {
 		prob *= initial_belief_funcs_[s].GetValue(0, state[s]);
 	}
 	return prob;
@@ -1063,24 +1063,24 @@ double Parser::InitialWeight(const vector<int>& state) const {
 
 bool Parser::Step(vector<int>& state, double random, int action, double& reward,
 	OBS_TYPE& obs) const {
-	for (int s = 0; s < prev_state_vars_.size(); s++)
+	for (size_t s = 0; s < prev_state_vars_.size(); s++)
 		prev_state_vars_[s].curr_value = state[s];
 	action_vars_[0].curr_value = action;
 
-	for (int s = 0; s < state.size(); s++) {
+	for (size_t s = 0; s < state.size(); s++) {
 		state[s] = transition_funcs_[s]->ComputeCurrentIndex(random);
 	}
 
-	for (int s = 0; s < curr_state_vars_.size(); s++)
+	for (size_t s = 0; s < curr_state_vars_.size(); s++)
 		curr_state_vars_[s].curr_value = state[s];
 
 	// Reward may depend on both current state and prev state
 	reward = 0;
-	for (int r = 0; r < reward_funcs_.size(); r++)
+	for (size_t r = 0; r < reward_funcs_.size(); r++)
 		reward += reward_funcs_[r].GetValue();
 
 	obs = 0;
-	for (int o = 0; o < obs_vars_.size(); o++) {
+	for (size_t o = 0; o < obs_vars_.size(); o++) {
 		obs = obs * obs_vars_[o].Size()
 			+ obs_funcs_[o]->ComputeCurrentIndex(random);
 	}
@@ -1090,14 +1090,14 @@ bool Parser::Step(vector<int>& state, double random, int action, double& reward,
 
 double Parser::GetReward(const vector<int>& prev_state,
 	const vector<int>& curr_state, int action) const {
-	for (int s = 0; s < prev_state_vars_.size(); s++)
+	for (size_t s = 0; s < prev_state_vars_.size(); s++)
 		prev_state_vars_[s].curr_value = prev_state[s];
-	for (int s = 0; s < curr_state_vars_.size(); s++)
+	for (size_t s = 0; s < curr_state_vars_.size(); s++)
 		curr_state_vars_[s].curr_value = curr_state[s];
 	action_vars_[0].curr_value = action;
 
 	double reward = 0;
-	for (int r = 0; r < reward_funcs_.size(); r++)
+	for (size_t r = 0; r < reward_funcs_.size(); r++)
 		reward += reward_funcs_[r].GetValue();
 	return reward;
 }
@@ -1106,18 +1106,18 @@ double Parser::GetReward(int action) const {
 	action_vars_[0].curr_value = action;
 
 	double reward = 0;
-	for (int r = 0; r < reward_funcs_.size(); r++)
+	for (size_t r = 0; r < reward_funcs_.size(); r++)
 		reward += reward_funcs_[r].GetValue();
 	return reward;
 }
 void Parser::GetNextState(vector<int>& state, int action,
 	double& random) const {
-	for (int s = 0; s < state.size(); s++) {
+	for (size_t s = 0; s < state.size(); s++) {
 		prev_state_vars_[s].curr_value = state[s];
 	}
 	action_vars_[0].curr_value = action;
 
-	for (int s = 0; s < state.size(); s++) {
+	for (size_t s = 0; s < state.size(); s++) {
 		if (!is_identity_[s][action])
 			state[s] = transition_funcs_[s]->ComputeCurrentIndex(random);
 		curr_state_vars_[s].curr_value = state[s];
@@ -1126,12 +1126,12 @@ void Parser::GetNextState(vector<int>& state, int action,
 
 void Parser::GetNoisyNextState(vector<int>& state, int action,
 	double& random) const {
-	for (int s = 0; s < state.size(); s++) {
+	for (size_t s = 0; s < state.size(); s++) {
 		prev_state_vars_[s].curr_value = state[s];
 	}
 	action_vars_[0].curr_value = action;
 
-	for (int s = 0; s < state.size(); s++) {
+	for (size_t s = 0; s < state.size(); s++) {
 		if (!is_identity_[s][action])
 			state[s] = noisy_transition_funcs_[s]->ComputeCurrentIndex(random);
 	}
@@ -1139,13 +1139,13 @@ void Parser::GetNoisyNextState(vector<int>& state, int action,
 
 OBS_TYPE Parser::GetObservation(const vector<int>& state, int action,
 	double& random) const {
-	for (int s = 0; s < state.size(); s++) {
+	for (size_t s = 0; s < state.size(); s++) {
 		curr_state_vars_[s].curr_value = state[s];
 	}
 	action_vars_[0].curr_value = action;
 
 	OBS_TYPE obs = 0;
-	for (int o = 0; o < obs_vars_.size(); o++) {
+	for (size_t o = 0; o < obs_vars_.size(); o++) {
 		obs = obs * obs_vars_[o].Size()
 			+ obs_funcs_[o]->ComputeCurrentIndex(random);
 	}
@@ -1155,7 +1155,7 @@ OBS_TYPE Parser::GetObservation(const vector<int>& state, int action,
 double Parser::LogNumStates() const {
 	double log_num_states = 0;
 
-	for (int i = 0; i < curr_state_vars_.size(); i++) {
+	for (size_t i = 0; i < curr_state_vars_.size(); i++) {
 		log_num_states += log2(curr_state_vars_[i].Size());
 	}
 
@@ -1167,7 +1167,7 @@ int Parser::NumStates() const {
 		return -1;
 	} else {
 		int num_states = 1;
-		for (int i = 0; i < curr_state_vars_.size(); i++) {
+		for (size_t i = 0; i < curr_state_vars_.size(); i++) {
 			num_states *= curr_state_vars_[i].Size();
 		}
 
@@ -1178,9 +1178,9 @@ int Parser::NumStates() const {
 double Parser::LogNumInitialStates() const {
 	double log_num_states = 0;
 
-	for (int s = 0; s < curr_state_vars_.size(); s++) {
+	for (size_t s = 0; s < curr_state_vars_.size(); s++) {
 		double n = 0;
-		for (int v = 0; v < curr_state_vars_[s].Size(); v++)
+		for (int v = 0; v < static_cast<int>(curr_state_vars_[s].Size()); v++)
 			n += (initial_belief_funcs_[s].GetValue(0, v) > 0);
 		log_num_states += log2(n);
 	}
@@ -1194,9 +1194,9 @@ int Parser::NumInitialStates() const {
 	} else {
 		int num_states = 1;
 
-		for (int s = 0; s < prev_state_vars_.size(); s++) {
+		for (int s = 0; s < static_cast<int>(prev_state_vars_.size()); s++) {
 			int n = 0;
-			for (int v = 0; v < prev_state_vars_[s].Size(); v++)
+			for (int v = 0; v < static_cast<int>(prev_state_vars_[s].Size()); v++)
 				n += (initial_belief_funcs_[s].GetValue(0, v) > 0);
 			num_states *= n;
 		}
@@ -1208,7 +1208,7 @@ int Parser::NumInitialStates() const {
 double Parser::LogNumObservations() const {
 	double log_num_obss = 0;
 
-	for (int i = 0; i < obs_vars_.size(); i++) {
+	for (size_t i = 0; i < obs_vars_.size(); i++) {
 		log_num_obss += log2(obs_vars_[i].Size());
 	}
 
@@ -1221,7 +1221,7 @@ OBS_TYPE Parser::NumObservations() const {
 	} else {
 		OBS_TYPE num_obss = 1;
 
-		for (int i = 0; i < obs_vars_.size(); i++) {
+		for (size_t i = 0; i < obs_vars_.size(); i++) {
 			num_obss *= obs_vars_[i].Size();
 		}
 
@@ -1231,13 +1231,13 @@ OBS_TYPE Parser::NumObservations() const {
 
 double Parser::ObsProb(OBS_TYPE obs, const vector<int>& state,
 	int action) const {
-	for (int s = 0; s < state.size(); s++) {
+	for (size_t s = 0; s < state.size(); s++) {
 		curr_state_vars_[s].curr_value = state[s];
 	}
 	action_vars_[0].curr_value = action;
 
 	double prob = 1.0;
-	for (int o = obs_vars_.size() - 1; o >= 0; o--) {
+	for (size_t o = obs_vars_.size() - 1; o >= 0; o--) {
 		prob *= obs_funcs_[o]->GetValue(obs % obs_vars_[o].Size());
 		obs /= obs_vars_[o].Size();
 	}
@@ -1246,19 +1246,19 @@ double Parser::ObsProb(OBS_TYPE obs, const vector<int>& state,
 
 vector<pair<vector<int>, double> > Parser::ComputeTopTransitions(
 	const vector<int>& state, int action, int num) const {
-	for (int s = 0; s < state.size(); s++) {
+	for (size_t s = 0; s < state.size(); s++) {
 		prev_state_vars_[s].curr_value = state[s];
 	}
 	action_vars_[0].curr_value = action;
 
 	vector<pair<vector<int>, double> > best;
 	best.push_back(pair<vector<int>, double>(vector<int>(), 1.0));
-	for (int s = 0; s < state.size(); s++) {
+	for (size_t s = 0; s < state.size(); s++) {
 		// Compute sparse next state distribution
 		vector<pair<int, double> > distribution;
 		int pid = Variable::ComputeCurrentIndex(
 			transition_funcs_[s]->parents());
-		for (int v = 0; v < prev_state_vars_[s].Size(); v++) {
+		for (int v = 0; v < static_cast<int>(prev_state_vars_[s].Size()); v++) {
 			double prob = transition_funcs_[s]->GetValue(pid, v);
 			if (prob > 0)
 				distribution.push_back(pair<int, double>(v, prob));
@@ -1266,15 +1266,15 @@ vector<pair<vector<int>, double> > Parser::ComputeTopTransitions(
 
 		// Extend current best state vectors and keep the best
 		vector<pair<vector<int>, double> > tmp;
-		for (int i = 0; i < best.size(); i++) {
+		for (size_t i = 0; i < best.size(); i++) {
 			const pair<vector<int>, double>& it1 = best[i];
-			for (int j = 0; j < distribution.size(); j++) {
+			for (size_t j = 0; j < distribution.size(); j++) {
 				const pair<int, double>& it2 = distribution[j];
 
 				// Extend
 				double prob = it1.second * it2.second;
 
-				if (tmp.size() == num && prob < tmp.back().second)
+				if (static_cast<int>(tmp.size()) == num && prob < tmp.back().second)
 					continue;
 
 				vector<int> state = it1.first;
@@ -1282,7 +1282,7 @@ vector<pair<vector<int>, double> > Parser::ComputeTopTransitions(
 				pair<vector<int>, double> next(state, prob);
 
 				// Insert in descending order
-				int k = 0;
+				size_t k = 0;
 				for (; k < tmp.size(); k++) {
 					if (tmp[k].second < next.second)
 						break;
@@ -1290,7 +1290,7 @@ vector<pair<vector<int>, double> > Parser::ComputeTopTransitions(
 				tmp.insert(tmp.begin() + k, next);
 
 				// Keep the best
-				if (num != -1 && tmp.size() > num)
+				if (num != -1 && static_cast<int>(tmp.size()) > num)
 					tmp.resize(num);
 			}
 		}
@@ -1304,7 +1304,7 @@ bool Parser::IsSelfLoopingWithoutReward(const vector<int>& state) const {
 	if (selfloop_state_set_.find(state) != selfloop_state_set_.end())
 		return true;
 
-	for (int s = 0; s < state.size(); s++) {
+	for (size_t s = 0; s < state.size(); s++) {
 		prev_state_vars_[s].curr_value = state[s];
 		curr_state_vars_[s].curr_value = state[s];
 	}
@@ -1312,12 +1312,12 @@ bool Parser::IsSelfLoopingWithoutReward(const vector<int>& state) const {
 	for (int a = 0; a < action_vars_[0].Size(); a++) {
 		action_vars_[0].curr_value = a;
 
-		for (int s = 0; s < state.size(); s++) {
+		for (size_t s = 0; s < state.size(); s++) {
 			if (transition_funcs_[s]->GetValue(state[s]) != 1.0)
 				return false;
 		}
 
-		for (int r = 0; r < reward_funcs_.size(); r++) {
+		for (size_t r = 0; r < reward_funcs_.size(); r++) {
 			if (reward_funcs_[r].GetValue() != 0)
 				return false;
 		}
@@ -1337,10 +1337,10 @@ bool Parser::IsSelfLoopingWithoutReward(const vector<int>& state) const {
 }
 
 bool Parser::IsInTerminalStateSet(const vector<int>& state) const {
-	for (int i = 0; i < terminal_state_patterns_.size(); i++) {
+	for (size_t i = 0; i < terminal_state_patterns_.size(); i++) {
 		const TerminalPattern& pattern = terminal_state_patterns_[i];
 		vector<int> val;
-		for (int i = 0; i < pattern.state_ids.size(); i++) {
+		for (size_t i = 0; i < pattern.state_ids.size(); i++) {
 			int id = pattern.state_ids[i];
 			val.push_back(state[id]);
 		}
@@ -1353,7 +1353,7 @@ bool Parser::IsInTerminalStateSet(const vector<int>& state) const {
 
 void Parser::PrintState(const vector<int>& state, ostream& out) const {
 	out << "[";
-	for (int s = 0; s < state.size(); s++) {
+	for (size_t s = 0; s < state.size(); s++) {
 		out << (s == 0 ? "" : ", ") << curr_state_vars_[s].name() << ":"
 			<< curr_state_vars_[s].GetValue(state[s]);
 	}
@@ -1368,7 +1368,7 @@ void Parser::PrintObs(OBS_TYPE obs, ostream& out) const {
 	}
 
 	out << "[";
-	for (int o = 0; o < obs_vars_.size(); o++) {
+	for (size_t o = 0; o < obs_vars_.size(); o++) {
 		out << (o == 0 ? "" : ", ") << obs_vars_[o].name() << ":"
 			<< obs_vars_[o].GetValue(obs_vec[o]);
 	}
@@ -1381,7 +1381,7 @@ void Parser::PrintAction(int action, ostream& out) const {
 
 OBS_TYPE Parser::GetPOMDPXObservation(map<string, string>& observe) {
 	OBS_TYPE obs = 0;
-	for (int o = 0; o < obs_vars_.size(); o++) {
+	for (size_t o = 0; o < obs_vars_.size(); o++) {
 		int index = obs_vars_[o].IndexOf(observe[obs_vars_[o].name()]);
 		obs = obs * obs_vars_[o].Size() + index;
 	}

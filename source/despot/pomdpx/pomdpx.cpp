@@ -150,7 +150,7 @@ public:
 
 		// Update particles by looping through the particles for multiple iterations
 		for (int i = 0; i < max_iter_; i++) {
-			for (int j = 0; j < particles_.size(); j++) {
+			for (size_t j = 0; j < particles_.size(); j++) {
 				State* particle = particles_[j];
 				State* copy = model_->Copy(particle);
 
@@ -179,7 +179,7 @@ public:
 		// inconsistent particles after that
 		if (updated.size() != particles_.size()) {
 			for (int i = 0; i < max_iter_ + 1; i++) {
-				for (int j = 0; j < particles_.size(); j++) {
+				for (size_t j = 0; j < particles_.size(); j++) {
 					State* particle = particles_[j];
 					State* copy = model_->Copy(particle);
 
@@ -208,14 +208,14 @@ public:
 			}
 		}
 
-		for (int i = 0; i < particles_.size(); i++)
+		for (size_t i = 0; i < particles_.size(); i++)
 			model_->Free(particles_[i]);
 
 		particles_ = updated;
 
 		double total_weight = State::Weight(particles_);
 		double weight_square_sum = 0;
-		for (int i = 0; i < particles_.size(); i++) {
+		for (size_t i = 0; i < particles_.size(); i++) {
 			State* particle = particles_[i];
 			particle->weight /= total_weight;
 			weight_square_sum += particle->weight * particle->weight;
@@ -229,7 +229,7 @@ public:
 				<< num_effective_particles << endl;
 			vector<State*> new_belief = Belief::Sample(num_particles_,
 				particles_, model_);
-			for (int i = 0; i < particles_.size(); i++)
+			for (size_t i = 0; i < particles_.size(); i++)
 				model_->Free(particles_[i]);
 
 			particles_ = new_belief;
@@ -292,13 +292,13 @@ void POMDPX::InitStates() {
 	double start = get_time_second();
 	states_.resize(NumStates());
 
-	for (int s = 0; s < states_.size(); s++) {
+	for (int s = 0; s < static_cast<int>(states_.size()); s++) {
 		POMDPXState* state = static_cast<POMDPXState*>(Allocate(s, 0));
 		state->vec_id = parser_->ComputeState(s);
 		states_[s] = state;
 	}
 
-	for (int s = 0; s < states_.size(); s++)
+	for (int s = 0; s < static_cast<int>(states_.size()); s++)
 		assert(GetIndex(states_[s]) == s);
 
 	logi << "[POMDPX::InitState] Initialized state table in "
@@ -317,7 +317,7 @@ void POMDPX::InitTransitions() {
 		for (int a = 0; a < num_actions; a++) {
 			vector<pair<vector<int>, double> > best =
 				parser_->ComputeTopTransitions(state, a, 500000 / num_states);
-			for (int i = 0; i < best.size(); i++) {
+			for (size_t i = 0; i < best.size(); i++) {
 				const pair<vector<int>, double>& pair = best[i];
 				transition_probabilities_[s][a].push_back(
 					State(parser_->ComputeIndex(pair.first), pair.second));
@@ -337,7 +337,7 @@ void POMDPX::PrintTransitions() {
 		transition_probabilities_[s].resize(num_actions);
 		for (int a = 0; a < num_actions; a++) {
 			cout << "Action " << a << " -> " << endl;
-			for (int i = 0; i < transition_probabilities_[s][a].size(); i++) {
+			for (size_t i = 0; i < transition_probabilities_[s][a].size(); i++) {
 				const State& state = transition_probabilities_[s][a][i];
 				cout << "w = " << state.weight << endl;
 				PrintState(*states_[state.state_id]);
@@ -357,7 +357,7 @@ void POMDPX::InitRewards() {
 		for (int a = 0; a < NumActions(); a++) {
 			rewards_[s][a] = 0.0;
 			const vector<State>& transition = TransitionProbability(s, a);
-			for (int i = 0; i< transition.size(); i++) {
+			for (size_t i = 0; i< transition.size(); i++) {
 				const State& next = transition[i];
 				rewards_[s][a] += next.weight
 					* parser_->GetReward(states_[s]->vec_id,
@@ -426,7 +426,7 @@ public:
 		double maxReward = Globals::NEG_INFTY;
 		for (int action = 0; action < pomdpx_model_->NumActions(); action++) {
 			double reward = 0;
-			for (int i = 0; i < particles.size(); i++) {
+			for (size_t i = 0; i < particles.size(); i++) {
 				State* particle = particles[i];
 				POMDPXState* state = static_cast<POMDPXState*>(particle);
 				reward += state->weight

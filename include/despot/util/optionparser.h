@@ -1556,12 +1556,10 @@ inline bool Parser::workhorse(bool gnu, const Descriptor usage[], int numargs,
 		bool try_single_minus_longopt = single_minus_longopt;
 		bool have_more_args = (numargs > 1 || numargs < 0); // is referencing argv[1] valid?
 
+        int idx = 0;
+        const char* optarg = nullptr;
 		do // loop over short options in group, for long options the body is executed only once
 		{
-			int idx;
-
-			const char* optarg;
-
 			/******************** long option **********************/
 			if (handle_short_options == false || try_single_minus_longopt) {
 				idx = 0;

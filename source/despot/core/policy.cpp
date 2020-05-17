@@ -23,13 +23,13 @@ Policy::~Policy() {
 ValuedAction Policy::Value(const vector<State*>& particles,
 	RandomStreams& streams, History& history) const {
 	vector<State*> copy;
-	for (int i = 0; i < particles.size(); i++)
+	for (size_t i = 0; i < particles.size(); i++)
 		copy.push_back(model_->Copy(particles[i]));
 
 	initial_depth_ = history.Size();
 	ValuedAction va = RecursiveValue(copy, streams, history);
 
-	for (int i = 0; i < copy.size(); i++)
+	for (size_t i = 0; i < copy.size(); i++)
 		model_->Free(copy[i]);
 
 	return va;
@@ -49,7 +49,7 @@ ValuedAction Policy::RecursiveValue(const vector<State*>& particles,
 		map<OBS_TYPE, vector<State*> > partitions;
 		OBS_TYPE obs;
 		double reward;
-		for (int i = 0; i < particles.size(); i++) {
+		for (size_t i = 0; i < particles.size(); i++) {
 			State* particle = particles[i];
 			bool terminal = model_->Step(*particle,
 				streams.Entry(particle->scenario_id), action, reward, obs);
@@ -91,7 +91,7 @@ ValuedAction Policy::Search() {
 	int action = Action(particles, streams, history_);
 	double dummy_value = Globals::NEG_INFTY;
 
-	for (int i = 0; i < particles.size(); i++)
+	for (size_t i = 0; i < particles.size(); i++)
 		model_->Free(particles[i]);
 
 	return ValuedAction(action, dummy_value);
@@ -135,7 +135,7 @@ RandomPolicy::RandomPolicy(const DSPOMDP* model,
 	Policy(model, bound, belief),
 	action_probs_(action_probs) {
 	double sum = 0;
-	for (int i = 0; i < action_probs.size(); i++)
+	for (size_t i = 0; i < action_probs.size(); i++)
 		sum += action_probs[i];
 	assert(fabs(sum - 1.0) < 1.0e-8);
 }
@@ -178,7 +178,7 @@ int MajorityActionPolicy::Action(const vector<State*>& particles,
 	RandomStreams& streams, History& history) const {
 	vector<double> frequencies(model_->NumActions());
 
-	for (int i = 0; i < particles.size(); i++) {
+	for (size_t i = 0; i < particles.size(); i++) {
 		State* particle = particles[i];
 		int action = policy_.GetAction(*particle);
 		frequencies[action] += particle->weight;
@@ -186,7 +186,7 @@ int MajorityActionPolicy::Action(const vector<State*>& particles,
 
 	int bestAction = 0;
 	double bestWeight = frequencies[0];
-	for (int a = 1; a < frequencies.size(); a++) {
+	for (size_t a = 1; a < frequencies.size(); a++) {
 		if (bestWeight < frequencies[a]) {
 			bestWeight = frequencies[a];
 			bestAction = a;
@@ -213,7 +213,7 @@ int ModeStatePolicy::Action(const vector<State*>& particles,
 	RandomStreams& streams, History& history) const {
 	double maxWeight = 0;
 	State* mode = NULL;
-	for (int i = 0; i < particles.size(); i++) {
+	for (size_t i = 0; i < particles.size(); i++) {
 		State* particle = particles[i];
 		int id = indexer_.GetIndex(particle);
 		state_probs_[id] += particle->weight;
@@ -224,7 +224,7 @@ int ModeStatePolicy::Action(const vector<State*>& particles,
 		}
 	}
 
-	for (int i = 0; i < particles.size(); i++) {
+	for (size_t i = 0; i < particles.size(); i++) {
 		state_probs_[indexer_.GetIndex(particles[i])] = 0;
 	}
 

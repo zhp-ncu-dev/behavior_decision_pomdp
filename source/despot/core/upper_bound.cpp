@@ -32,7 +32,7 @@ ParticleUpperBound::~ParticleUpperBound() {
 double ParticleUpperBound::Value(const vector<State*>& particles,
 	RandomStreams& streams, History& history) const {
 	double value = 0;
-	for (int i = 0; i < particles.size(); i++) {
+	for (size_t i = 0; i < particles.size(); i++) {
 		State* particle = particles[i];
 		value += particle->weight * Value(*particle);
 	}
@@ -114,7 +114,7 @@ void LookaheadUpperBound::Init(const RandomStreams& streams) {
 double LookaheadUpperBound::Value(const vector<State*>& particles,
 	RandomStreams& streams, History& history) const {
 	double bound = 0;
-	for (int i = 0; i < particles.size(); i++) {
+	for (size_t i = 0; i < particles.size(); i++) {
 		State* particle = particles[i];
 		bound +=
 			particle->weight
@@ -164,7 +164,7 @@ double MDPUpperBound::Value(const Belief* belief) const {
 		static_cast<const ParticleBelief*>(belief)->particles();
 
 	double value = 0;
-	for (int i = 0; i < particles.size(); i++) {
+	for (size_t i = 0; i < particles.size(); i++) {
 		State* particle = particles[i];
 		value += particle->weight * policy_[indexer_.GetIndex(particle)].value;
 	}

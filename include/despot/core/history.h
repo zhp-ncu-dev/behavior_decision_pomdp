@@ -49,13 +49,13 @@ public:
 
 	History Suffix(int s) const {
 		History history;
-		for (int i = s; i < Size(); i++)
+		for (size_t i = s; i < Size(); i++)
 			history.Add(Action(i), Observation(i));
 		return history;
 	}
 
 	friend std::ostream& operator<<(std::ostream& os, const History& history) {
-		for (int i = 0; i < history.Size(); i++)
+		for (size_t i = 0; i < history.Size(); i++)
 			os << "(" << history.Action(i) << ", " << history.Observation(i)
 				<< ") ";
 		return os;

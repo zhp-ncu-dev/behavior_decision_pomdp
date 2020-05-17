@@ -50,7 +50,7 @@ public:
 class ParticleBelief: public Belief {
 protected:
 	std::vector<State*> particles_;
-	int num_particles_;
+    size_t num_particles_;
 	Belief* prior_;
 	bool split_;
 	std::vector<State*> initial_particles_;

@@ -71,7 +71,7 @@ ValuedAction AEMS::Search() {
 
 ValuedAction AEMS::OptimalAction(const VNode* vnode) {
 	ValuedAction astar(-1, Globals::NEG_INFTY);
-	for (int action = 0; action < vnode->children().size(); action++) {
+	for (size_t action = 0; action < vnode->children().size(); action++) {
 		const QNode* qnode = vnode->Child(action);
 		if (qnode->lower_bound() > astar.value) {
 			astar = ValuedAction(action, qnode->lower_bound());
@@ -97,7 +97,7 @@ void AEMS::FindMaxApproxErrorLeaf(VNode* vnode, double likelihood,
 			bestNode = vnode;
 		}
 	} else {
-		for (int a = 0; a < vnode->children().size(); a++) {
+		for (size_t a = 0; a < vnode->children().size(); a++) {
 			FindMaxApproxErrorLeaf(vnode->Child(a), likelihood, bestAE,
 				bestNode);
 		}
@@ -123,7 +123,7 @@ double AEMS::Likelihood(QNode* qnode) {
 double AEMS::AEMS2Likelihood(QNode* qnode) {
 	VNode* vnode = qnode->parent();
 	QNode* qstar = NULL;
-	for (int action = 0; action < vnode->children().size(); action++) {
+	for (size_t action = 0; action < vnode->children().size(); action++) {
 		QNode* child = vnode->Child(action);
 
 		if (qstar == NULL || child->upper_bound() > qstar->upper_bound())
@@ -140,7 +140,7 @@ void AEMS::Update(VNode* vnode) {
 	double lower = Globals::NEG_INFTY;
 	double upper = Globals::NEG_INFTY;
 
-	for (int action = 0; action < vnode->children().size(); action++) {
+	for (size_t action = 0; action < vnode->children().size(); action++) {
 		QNode* qnode = vnode->Child(action);
 
 		lower = max(lower, qnode->lower_bound());

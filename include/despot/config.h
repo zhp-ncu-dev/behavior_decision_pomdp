@@ -15,7 +15,7 @@ struct Config {
 	double xi; // xi * gap(root) is the target uncertainty at the root.
 	int sim_len; // Number of steps to run the simulation for.
   std::string default_action;
-	int max_policy_sim_len; // Maximum number of steps for simulating the default policy
+    size_t max_policy_sim_len; // Maximum number of steps for simulating the default policy
 	double noise;
 	bool silence;
 

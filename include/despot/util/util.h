@@ -117,7 +117,7 @@ inline double get_time_second() {
 inline std::string lower(std::string str) {
   std::locale loc;
 	std::string copy = str;
-	for (int i = 0; i < copy.length(); i++)
+	for (size_t i = 0; i < copy.length(); i++)
 		copy[i] = std::tolower(copy[i], loc);
 	return copy;
 }
@@ -149,7 +149,7 @@ std::ostream& operator<<(std::ostream& os, std::pair<K, V> p) {
 template<typename T>
 std::ostream& operator<<(std::ostream& os, std::vector<T> vec) {
 	os << "[";
-	for (int i = 0; i < vec.size(); i++)
+	for (size_t i = 0; i < vec.size(); i++)
 		os << (i == 0 ? "" : ", ") << vec[i];
 	os << "]";
 	return os;

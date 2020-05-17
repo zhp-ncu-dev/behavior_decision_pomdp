@@ -47,7 +47,7 @@ ValuedAction ScenarioLowerBound::Search() {
 
 	ValuedAction va = Value(particles, streams, history_);
 
-	for (int i = 0; i < particles.size(); i++)
+	for (size_t i = 0; i < particles.size(); i++)
 		model_->Free(particles[i]);
 
 	return va;
@@ -74,7 +74,7 @@ ValuedAction POMCPScenarioLowerBound::Value(const vector<State*>& particles,
 	prior_->history(history);
 	VNode* root = POMCP::CreateVNode(0, particles[0], prior_, model_);
 	// Note that particles are assumed to be of equal weight
-	for (int i = 0; i < particles.size(); i++) {
+	for (size_t i = 0; i < particles.size(); i++) {
 		State* particle = particles[i];
 		State* copy = model_->Copy(particle);
 		POMCP::Simulate(copy, streams, root, model_, prior_);

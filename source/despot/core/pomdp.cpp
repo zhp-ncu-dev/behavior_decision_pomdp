@@ -36,7 +36,7 @@ string State::text() const {
 
 double State::Weight(const vector<State*>& particles) {
 	double weight = 0;
-	for (int i = 0; i < particles.size(); i++)
+	for (size_t i = 0; i < particles.size(); i++)
 		weight += particles[i]->weight;
 	return weight;
 }
@@ -142,7 +142,7 @@ POMCPPrior* DSPOMDP::CreatePOMCPPrior(string name) const {
 
 vector<State*> DSPOMDP::Copy(const vector<State*>& particles) const {
 	vector<State*> copy;
-	for (int i = 0; i < particles.size(); i++)
+	for (size_t i = 0; i < particles.size(); i++)
 		copy.push_back(Copy(particles[i]));
 	return copy;
 }

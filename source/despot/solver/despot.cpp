@@ -125,7 +125,7 @@ VNode* DESPOT::ConstructTree(vector<State*>& particles, RandomStreams& streams,
 		statistics->num_particles_before_search = model->NumActiveParticles();
 	}
 
-	for (int i = 0; i < particles.size(); i++) {
+	for (size_t i = 0; i < particles.size(); i++) {
 		particles[i]->scenario_id = i;
 	}
 
@@ -218,7 +218,7 @@ void DESPOT::InitBounds(VNode* vnode, ScenarioLowerBound* lower_bound,
 }
 
 ValuedAction DESPOT::Search() {
-	if (logging::level() >= logging::DEBUG) {
+	if (logging::level() >= logging::Debug) {
 		model_->PrintBelief(*belief_);
 	}
 
@@ -281,7 +281,7 @@ double DESPOT::CheckDESPOT(const VNode* vnode, double regularized_value) {
 
 	const vector<State*>& particles = vnode->particles();
 	vector<State*> copy;
-	for (int i = 0; i < particles.size(); i ++) {
+	for (size_t i = 0; i < particles.size(); i ++) {
 		copy.push_back(model_->Copy(particles[i]));
 	}
 	VNode* root = new VNode(copy);
@@ -351,7 +351,7 @@ double DESPOT::CheckDESPOTSTAR(const VNode* vnode, double regularized_value) {
 
 	const vector<State*>& particles = vnode->particles();
 	vector<State*> copy;
-	for (int i = 0; i < particles.size(); i++) {
+	for (size_t i = 0; i < particles.size(); i++) {
 		copy.push_back(model_->Copy(particles[i]));
 	}
 	VNode* root = new VNode(copy);
@@ -396,7 +396,7 @@ VNode* DESPOT::Prune(VNode* vnode, int& pruned_action, double& pruned_value) {
 	int astar = -1;
 	double nustar = Globals::NEG_INFTY;
 	QNode* qstar = NULL;
-	for (int i = 0; i < children.size(); i++) {
+	for (size_t i = 0; i < children.size(); i++) {
 		QNode* qnode = children[i];
 		double nu;
 		QNode* pruned_q = Prune(qnode, nu);
@@ -459,7 +459,7 @@ QNode* DESPOT::Prune(QNode* qnode, double& pruned_value) {
 
 ValuedAction DESPOT::OptimalAction(VNode* vnode) {
 	ValuedAction astar(-1, Globals::NEG_INFTY);
-	for (int action = 0; action < vnode->children().size(); action++) {
+	for (size_t action = 0; action < vnode->children().size(); action++) {
 		QNode* qnode = vnode->Child(action);
 		if (qnode->lower_bound() > astar.value) {
 			astar = ValuedAction(action, qnode->lower_bound());
@@ -510,7 +510,7 @@ VNode* DESPOT::SelectBestWEUNode(QNode* qnode) {
 QNode* DESPOT::SelectBestUpperBoundNode(VNode* vnode) {
 	int astar = -1;
 	double upperstar = Globals::NEG_INFTY;
-	for (int action = 0; action < vnode->children().size(); action++) {
+	for (size_t action = 0; action < vnode->children().size(); action++) {
 		QNode* qnode = vnode->Child(action);
 
 		if (qnode->upper_bound() > upperstar) {
@@ -531,7 +531,7 @@ void DESPOT::Update(VNode* vnode) {
 	double upper = vnode->default_move().value;
 	double utility_upper = Globals::NEG_INFTY;
 
-	for (int action = 0; action < vnode->children().size(); action++) {
+	for (size_t action = 0; action < vnode->children().size(); action++) {
 		QNode* qnode = vnode->Child(action);
 
 		lower = max(lower, qnode->lower_bound());
@@ -650,7 +650,7 @@ void DESPOT::Expand(QNode* qnode, ScenarioLowerBound* lb,
 	map<OBS_TYPE, vector<State*> > partitions;
 	OBS_TYPE obs;
 	double reward;
-	for (int i = 0; i < particles.size(); i++) {
+	for (size_t i = 0; i < particles.size(); i++) {
 		State* particle = particles[i];
 		logd << " Original: " << *particle << endl;
 
@@ -710,11 +710,11 @@ ValuedAction DESPOT::Evaluate(VNode* root, vector<State*>& particles,
 	RandomStreams& streams, POMCPPrior* prior, const DSPOMDP* model) {
 	double value = 0;
 
-	for (int i = 0; i < particles.size(); i++) {
+	for (size_t i = 0; i < particles.size(); i++) {
 		particles[i]->scenario_id = i;
 	}
 
-	for (int i = 0; i < particles.size(); i++) {
+	for (size_t i = 0; i < particles.size(); i++) {
 		State* particle = particles[i];
 		VNode* cur = root;
 		State* copy = model->Copy(particle);

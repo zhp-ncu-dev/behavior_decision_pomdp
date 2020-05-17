@@ -82,7 +82,7 @@ ValuedAction POMCP::Search(double timeout) {
 	int num_sims = 0;
 	while (true) {
 		vector<State*> particles = belief_->Sample(1000);
-		for (int i = 0; i < particles.size(); i++) {
+		for (size_t i = 0; i < particles.size(); i++) {
 			State* particle = particles[i];
 			logd << "[POMCP::Search] Starting simulation " << num_sims << endl;
 
@@ -98,7 +98,7 @@ ValuedAction POMCP::Search(double timeout) {
 			}
 		}
 
-		for (int i = 0; i < particles.size(); i++) {
+		for (size_t i = 0; i < particles.size(); i++) {
 			model_->Free(particles[i]);
 		}
 
@@ -178,7 +178,7 @@ int POMCP::UpperBoundAction(const VNode* vnode, double explore_constant) {
 	 }
 	 */
 
-	for (int action = 0; action < qnodes.size(); action++) {
+	for (size_t action = 0; action < qnodes.size(); action++) {
 		if (qnodes[action]->count() == 0)
 			return action;
 
@@ -199,7 +199,7 @@ int POMCP::UpperBoundAction(const VNode* vnode, double explore_constant) {
 ValuedAction POMCP::OptimalAction(const VNode* vnode) {
 	const vector<QNode*>& qnodes = vnode->children();
 	ValuedAction astar(-1, Globals::NEG_INFTY);
-	for (int action = 0; action < qnodes.size(); action++) {
+	for (size_t action = 0; action < qnodes.size(); action++) {
 		// cout << action << " " << qnodes[action]->value() << " " << qnodes[action]->count() << " " << vnode->count() << endl;
 		if (qnodes[action]->value() > astar.value) {
 			astar = ValuedAction(action, qnodes[action]->value());
@@ -211,7 +211,7 @@ ValuedAction POMCP::OptimalAction(const VNode* vnode) {
 
 int POMCP::Count(const VNode* vnode) {
 	int count = 0;
-	for (int action = 0; action < vnode->children().size(); action++)
+	for (size_t action = 0; action < vnode->children().size(); action++)
 		count += vnode->Child(action)->count();
 	return count;
 }
@@ -245,13 +245,13 @@ VNode* POMCP::CreateVNode(int depth, const State* state, POMCPPrior* prior,
 			vnode->children().push_back(qnode);
 		}
 
-		for (int a = 0; a < legal_actions.size(); a++) {
+		for (size_t a = 0; a < legal_actions.size(); a++) {
 			QNode* qnode = vnode->Child(legal_actions[a]);
 			qnode->count(0);
 			qnode->value(0);
 		}
 
-		for (int a = 0; a < preferred_actions.size(); a++) {
+		for (size_t a = 0; a < preferred_actions.size(); a++) {
 			int action = preferred_actions[a];
 			QNode* qnode = vnode->Child(action);
 			qnode->count(prior->SmartCount(action));
@@ -393,10 +393,10 @@ ValuedAction POMCP::Evaluate(VNode* root, vector<State*>& particles,
 	RandomStreams& streams, const DSPOMDP* model, POMCPPrior* prior) {
 	double value = 0;
 
-	for (int i = 0; i < particles.size(); i++)
+	for (size_t i = 0; i < particles.size(); i++)
 		particles[i]->scenario_id = i;
 
-	for (int i = 0; i < particles.size(); i++) {
+	for (size_t i = 0; i < particles.size(); i++) {
 		State* particle = particles[i];
 		VNode* cur = root;
 		State* copy = model->Copy(particle);
@@ -473,7 +473,7 @@ ValuedAction DPOMCP::Search(double timeout) {
 	root_ = ConstructTree(particles, streams, model_, prior_, history_,
 		timeout);
 
-	for (int i = 0; i < particles.size(); i++)
+	for (size_t i = 0; i < particles.size(); i++)
 		model_->Free(particles[i]);
 
 	logi << "[DPOMCP::Search] Time: CPU / Real = "
@@ -499,7 +499,7 @@ VNode* DPOMCP::ConstructTree(vector<State*>& particles, RandomStreams& streams,
 	prior->history(history);
 	VNode* root = CreateVNode(0, particles[0], prior, model);
 
-	for (int i = 0; i < particles.size(); i++)
+	for (size_t i = 0; i < particles.size(); i++)
 		particles[i]->scenario_id = i;
 
 	logi << "[DPOMCP::ConstructTree] # active particles before search = "
